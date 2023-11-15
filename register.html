@@ -1,0 +1,61 @@
+<?php
+$hostname = "localhost"; // Change to your MySQL host
+$username = "root"; // Change to your MySQL username
+$password = ""; // Change to your MySQL password
+$database = "login_hillcipher"; // Change to your MySQL database name
+
+$conn = new mysqli($hostname, $username, $password, $database);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+
+    // Perform any necessary validation on the input data
+
+    // Hash the password for security (you should use a more secure hashing method in production)
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    // Prepare and execute a SQL query using prepared statements
+    $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $username, $hashedPassword);
+    $stmt->execute();
+
+    // Check for query execution success
+    if ($stmt) {
+        echo "Registration successful. Redirect or perform further actions here.";
+    } else {
+        echo "Registration failed. Error: " ;
+    }
+
+    // Close the prepared statement
+    $stmt->close();
+}
+
+// Close the database connection
+$conn->close();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <form method="post" action="">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>
